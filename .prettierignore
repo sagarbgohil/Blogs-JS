@@ -1,0 +1,9 @@
+node_modules
+coverage
+
+*.env
+.env.*
+
+/.vscode
+/node_modules
+./dist
