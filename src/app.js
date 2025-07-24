@@ -15,6 +15,7 @@ import { swaggerSpecs } from './config/swagger/swagger.js';
 import { apiRouter } from './routes/api.routes.js';
 import ApiError from './utils/apiError.js';
 import { errorConverter, errorHandler } from './middlewares/error.js';
+import { requestLogger } from './middlewares/reqLogger.js';
 
 export const app = express();
 
@@ -39,6 +40,8 @@ app.use(responseMiddleware);
 app.use(compression());
 
 app.use(express.static('public'));
+
+app.use(requestLogger);
 
 app.use(cors());
 app.options('*cors', cors());

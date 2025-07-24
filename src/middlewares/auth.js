@@ -4,6 +4,7 @@ import crypto from 'crypto';
 
 import env from '../config/environment.js';
 import { roleRights } from '../config/constants.js';
+import ApiError from '../utils/apiError.js';
 
 export const verifyCallback = (req, resolve, reject, data) => async (err, user, info) => {
     if (err || info || !user) {
@@ -17,7 +18,7 @@ export const verifyCallback = (req, resolve, reject, data) => async (err, user, 
 
     const { roles, rights } = data || {};
 
-    if (rights.length) {
+    if (rights && rights.length) {
         const userRights = roleRights.get(user.role);
         const hasRequiredRights = rights.every((requiredRight) => userRights.includes(requiredRight));
         if (!hasRequiredRights && req.params.userId !== user.id) {
@@ -25,7 +26,7 @@ export const verifyCallback = (req, resolve, reject, data) => async (err, user, 
         }
     }
 
-    if (roles.length && !roles.includes(user.role)) {
+    if (roles && roles.length && !roles.includes(user.role)) {
         return reject(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
     }
 

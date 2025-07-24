@@ -1,17 +1,29 @@
 import { Types } from 'mongoose';
 import _ from 'lodash';
 
-export const deleteAtPath = (obj, path, index) => {
-    if (index === path.length - 1) {
-        delete obj[path[index]];
-        return;
+const deletePrivateFieldsRecursively = (schema, obj, schemaPaths) => {
+    if (_.isArray(obj)) {
+        obj.forEach((item) => deletePrivateFieldsRecursively(schema, item, schemaPaths));
+    } else if (_.isPlainObject(obj)) {
+        for (const key of Object.keys(obj)) {
+            const fullPath = key;
+            const pathDef = schemaPaths[fullPath];
+
+            // Remove private fields
+            if (pathDef?.options?.private) {
+                delete obj[key];
+                continue;
+            }
+
+            // Recurse
+            deletePrivateFieldsRecursively(schema, obj[key], schemaPaths);
+        }
     }
-    deleteAtPath(obj[path[index]], path, index + 1);
 };
 
 const convertIdRecursively = (obj) => {
     if (_.isArray(obj)) {
-        _.forEach(obj, (item) => convertIdRecursively(item));
+        obj.forEach((item) => convertIdRecursively(item));
     } else if (_.isPlainObject(obj)) {
         if (obj._id && obj._id instanceof Types.ObjectId) {
             obj.id = obj._id.toHexString();
@@ -26,9 +38,10 @@ const convertIdRecursively = (obj) => {
         delete obj.__v;
         // delete obj.createdAt;
         // delete obj.updatedAt;
-        _.forEach(obj, (value, key) => {
-            convertIdRecursively(value);
-        });
+
+        for (const key of Object.keys(obj)) {
+            convertIdRecursively(obj[key]);
+        }
     }
 };
 
@@ -40,12 +53,9 @@ export const toJSON = (schema) => {
 
     schema.options.toJSON = Object.assign(schema.options.toJSON || {}, {
         transform(doc, ret, options) {
-            Object.keys(schema.paths).forEach((path) => {
-                if (schema.paths[path].options && schema.paths[path].options.private) {
-                    deleteAtPath(ret, path.split('.'), 0);
-                }
-            });
+            deletePrivateFieldsRecursively(schema, ret, schema.paths);
 
+            // Convert ObjectId _id -> id
             convertIdRecursively(ret);
 
             if (transform) {

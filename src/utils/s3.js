@@ -4,11 +4,12 @@ import path from 'path';
 import fs from 'fs';
 import httpStatus from 'http-status';
 import { S3Client, PutObjectCommand, DeleteObjectsCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 import ApiError from './apiError.js';
 import { logger } from '../config/logger.js';
 import env from '../config/environment.js';
-import { generateOTP } from './math.js';
+import moment from 'moment';
 
 const localStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -17,8 +18,7 @@ const localStorage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
-        const uniqueName =
-            file.mimetype.split('/')[0] + '-' + Date.now().toString() + generateOTP() + path.extname(file.originalname);
+        const uniqueName = moment().format('YYYYMMDDHHmmss') + '-' + path.extname(file.originalname);
         cb(null, uniqueName);
     },
 });
@@ -43,17 +43,17 @@ export const uploadFileToS3 = async (file) => {
         const fileContent = fs.readFileSync(filePath);
 
         const uploadParams = {
-            Bucket: config.aws.bucketName || 'test-bucket',
+            Bucket: env.aws.bucket || 'test-bucket',
             Key: fileName,
             Body: fileContent,
             ContentType: mime.getType(filePath),
         };
 
-        const updloadedFile = await s3.send(new PutObjectCommand(uploadParams));
+        const uploadedFile = await s3.send(new PutObjectCommand(uploadParams));
 
         fs.unlinkSync(filePath);
 
-        return updloadedFile;
+        return uploadedFile;
     } catch (e) {
         logger.error(e);
         throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to upload file to S3!');
@@ -77,10 +77,29 @@ export const uploadFilesToS3 = async (files) => {
 
 export const deleteFiles = async (filesPathInS3) => {
     const params = {
-        Bucket: config.aws.bucketName || 'demourbanhelpapp',
+        Bucket: env.aws.bucket || 'test-bucket',
         Delete: {
             Objects: filesPathInS3.map((key) => ({ Key: key })),
         },
     };
     await s3.send(new DeleteObjectsCommand(params));
+};
+
+export const getUploadUrl = async (fileName, fileType) => {
+    try {
+        const command = new PutObjectCommand({
+            Bucket: env.aws.bucket || 'test-bucket',
+            Key: fileName,
+            ContentType: mime.getType(fileName) || fileType,
+        });
+
+        const url = await getSignedUrl(s3, command, {
+            expiresIn: 3600, // URL valid for 1 hour
+        });
+
+        return url;
+    } catch (error) {
+        logger.error(error);
+        throw Error('Failed to generate upload URL');
+    }
 };

@@ -22,3 +22,11 @@ export const allRights = {
 export const userRoles = Object.keys(allRights);
 
 export const roleRights = new Map(Object.entries(allRights));
+
+export const utpStatus = ['in-progress', 'completed'];
+
+export const paymentStatus = ['pending', 'completed', 'failed'];
+
+export const paymentTypes = ['one-time', 'monthly'];
+
+export const deviceTypes = ['web', 'android', 'ios'];

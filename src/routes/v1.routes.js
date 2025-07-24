@@ -5,7 +5,7 @@ import { authApiRouter } from '../modules/auth/auth.routes.js';
 
 const router = express.Router();
 
-router.use('/users', userApiRouter);
 router.use('/auth', authApiRouter);
+router.use('/users', userApiRouter);
 
 export { router as v1ApiRouter };
