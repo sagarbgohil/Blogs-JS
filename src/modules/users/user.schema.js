@@ -18,6 +18,10 @@ export const userSchemas = {
                 enum: userRoles,
                 description: 'The role of the user',
             },
+            isDeleted: {
+                type: 'boolean',
+                description: 'Indicates if the user is deleted',
+            },
             sortBy: {
                 type: 'string',
                 description: 'Field to sort by',
@@ -85,6 +89,14 @@ export const userSchemas = {
                 type: 'string',
                 description: 'The country code for the phone number',
             },
+            profile: {
+                type: 'string',
+                description: 'The profile image url of the user',
+            },
+            background: {
+                type: 'string',
+                description: 'The background image url of the user',
+            },
         },
         required: [],
         additionalProperties: false,
@@ -93,6 +105,8 @@ export const userSchemas = {
             bio: 'Software Developer',
             phone: '+1234567890',
             phoneCountryCode: '+1',
+            profile: 'https://example.com/profile.jpg',
+            background: 'https://example.com/background.jpg',
         },
     },
     modifyUserBackgroundRequest: {
@@ -107,13 +121,13 @@ export const userSchemas = {
         required: ['file'],
         additionalProperties: false,
     },
-    modifyUserPhotoRequest: {
+    modifyUserProfileRequest: {
         type: 'object',
         properties: {
             file: {
                 type: 'string',
                 format: 'binary',
-                description: 'The profile photo file to upload',
+                description: 'The profile image file to upload',
             },
         },
         required: ['file'],

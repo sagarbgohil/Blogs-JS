@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
+import moment from 'moment';
 
 import { toJSON } from '../../utils/toJson.js';
 import { paginate } from '../../utils/paginate.js';
 import { userProvider, userRoles } from '../../config/constants.js';
 import env from '../../config/environment.js';
-import moment from 'moment';
 
 const userSchema = new mongoose.Schema(
     {
@@ -70,25 +70,6 @@ const userSchema = new mongoose.Schema(
             type: Date,
             private: true,
         },
-
-        sessions: [
-            {
-                _id: false,
-                refreshToken: {
-                    type: String,
-                    private: true,
-                },
-                refreshTokenExpires: {
-                    type: Date,
-                    private: true,
-                },
-                createdAt: {
-                    type: Date,
-                    default: Date.now,
-                    // private: true,
-                },
-            },
-        ],
 
         phone: {
             type: String,
