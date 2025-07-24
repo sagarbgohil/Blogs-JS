@@ -96,7 +96,7 @@ router.post('/logout-all', auth(), logoutAll);
  * @swagger
  * /api/v1/auth/refresh:
  *   post:
- *     summary: Logout user
+ *     summary: Refresh user tokens
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -264,7 +264,7 @@ router.post('/sign-up', validate(signUpValidation), signUp);
 
 /**
  * @swagger
- * /api/v1/auth/social-token:
+ * /api/v1/auth/social-login:
  *   post:
  *     summary: Sign in with social token
  *     tags: [Auth]
@@ -294,7 +294,7 @@ router.post('/sign-up', validate(signUpValidation), signUp);
  *             schema:
  *               $ref: '#/components/schemas/errorResponse'
  */
-router.post('/social-token', validate(socialSignInValidation), socialSignIn);
+router.post('/social-login', validate(socialSignInValidation), socialSignIn);
 
 /**
  * @swagger

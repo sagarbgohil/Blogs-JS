@@ -4,7 +4,8 @@ import env from '../../config/environment.js';
 import moment from 'moment';
 import { tokenTypes } from '../../config/constants.js';
 import { generateOTP } from '../../utils/math.js';
-import { pushRefreshToken, updateUserById } from '../users/user.service.js';
+import { createSession } from '../sessions/sessions.service.js';
+import { logger } from '../../config/logger.js';
 
 export const verifyToken = async (token) => {
     try {
@@ -28,7 +29,9 @@ export const generateAuthTokens = async (user) => {
         expires: moment().add(env.jwt.refreshExpirationDays, 'days').toDate(),
     });
 
-    await pushRefreshToken(user.id, refreshToken);
+    await createSession(user.id, {
+        refreshToken,
+    });
 
     return { access: accessToken, refresh: refreshToken };
 };
