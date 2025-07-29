@@ -43,15 +43,21 @@ app.use(express.static('public'));
 
 app.use(requestLogger);
 
-app.use(cors());
-app.options('*cors', cors());
+const corsOptions = {
+    origin: env.corsOrigins.split(',').map((origin) => origin.trim()),
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    preflightContinue: false,
+};
+
+app.use(cors(corsOptions));
+app.options('*cors', cors(corsOptions));
 
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
 
-if (env.environment === 'prod') {
-    app.use('/api', authLimiter);
-}
+app.use('/api', authLimiter);
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 

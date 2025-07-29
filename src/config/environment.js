@@ -10,6 +10,10 @@ const envVarsSchema = Joi.object()
         ENVIRONMENT: Joi.string().valid('prod', 'stage', 'local', 'test').required(),
         PORT: Joi.number().required().default(4000),
 
+        // CORS configuration
+        // Comma separated list of allowed origins
+        CORS_ORIGINS: Joi.string().optional().default('*').description('CORS origins for the application'),
+
         // Database configuration
         MONGO_URI: Joi.string().required().description('Mongo DB url'),
 
@@ -61,6 +65,7 @@ const envVarsSchema = Joi.object()
         SMTP_USERNAME: Joi.string().required().description('username for email server'),
         SMTP_PASSWORD: Joi.string().required().description('password for email server'),
         EMAIL_FROM: Joi.string().required().description('the from field in the emails sent by the app'),
+        EMAIL_TO: Joi.string().required().description('the to field in the emails sent by the app'),
 
         // AWS configuration
         AWS_ACCESS_KEY_ID: Joi.string().required().description('AWS access key id'),
@@ -97,6 +102,7 @@ if (error) {
 const env = {
     environment: envVars.ENVIRONMENT,
     port: envVars.PORT,
+    corsOrigins: envVars.CORS_ORIGINS,
     mongo: {
         url: envVars.MONGO_URI + `-${envVars.ENVIRONMENT}`,
         options: {
@@ -138,6 +144,7 @@ const env = {
             },
         },
         from: envVars.EMAIL_FROM,
+        to: envVars.EMAIL_TO,
     },
     aws: {
         accessKeyId: envVars.AWS_ACCESS_KEY_ID,

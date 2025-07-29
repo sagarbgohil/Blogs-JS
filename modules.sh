@@ -2,7 +2,7 @@
 
 # Check if module name is provided
 if [ -z "$1" ]; then
-  echo "❌ Please provide a module name. Usage: ./create-module.sh moduleName"
+  echo "❌ Please provide a module name. Usage: ./module.sh moduleName"
   exit 1
 fi
 

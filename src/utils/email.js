@@ -65,6 +65,23 @@ export const sendResetPasswordEmail = async (to, data) => {
     });
 };
 
+export const sendContactUsEmail = async (to, data) => {
+    const { name, email, phone, service, message } = data;
+    const subject = `New Contact Us Submission from ${name}`;
+    await sendEmailByTemplate({
+        to,
+        subject,
+        templateName: 'contactUs',
+        contextData: {
+            name,
+            email,
+            phone,
+            service,
+            message,
+        },
+    });
+};
+
 export const sendVerificationEmail = async (to, data) => {
     const { token, name } = data;
     const subject = 'Email Verification OTP';
