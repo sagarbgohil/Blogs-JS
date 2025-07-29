@@ -162,7 +162,7 @@ export const authSchemas = {
                 type: 'string',
                 description: 'The unique ID from the social provider',
             },
-            image: {
+            profile: {
                 type: 'string',
                 format: 'uri',
                 description: 'The profile image URL of the user',

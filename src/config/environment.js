@@ -10,6 +10,10 @@ const envVarsSchema = Joi.object()
         ENVIRONMENT: Joi.string().valid('prod', 'stage', 'local', 'test').required(),
         PORT: Joi.number().required().default(4000),
 
+        // CORS configuration
+        // Comma separated list of allowed origins
+        CORS_ORIGINS: Joi.string().optional().default('*').description('CORS origins for the application'),
+
         // Database configuration
         MONGO_URI: Joi.string().required().description('Mongo DB url'),
 
@@ -20,6 +24,7 @@ const envVarsSchema = Joi.object()
 
         // API Key
         API_KEY: Joi.string().required().description('API key for the application'),
+        API_SECRET: Joi.string().required().description('API secret for the application'),
 
         // Rate Limiter
         RATE_LIMIT: Joi.number().optional().default(1).description('Rate limit per minute'),
@@ -60,6 +65,7 @@ const envVarsSchema = Joi.object()
         SMTP_USERNAME: Joi.string().required().description('username for email server'),
         SMTP_PASSWORD: Joi.string().required().description('password for email server'),
         EMAIL_FROM: Joi.string().required().description('the from field in the emails sent by the app'),
+        EMAIL_TO: Joi.string().required().description('the to field in the emails sent by the app'),
 
         // AWS configuration
         AWS_ACCESS_KEY_ID: Joi.string().required().description('AWS access key id'),
@@ -72,56 +78,18 @@ const envVarsSchema = Joi.object()
         GOOGLE_CLIENT_ID: Joi.string().required().description('Google client id'),
         GOOGLE_CLIENT_SECRET: Joi.string().required().description('Google client secret'),
 
-        // Paypal configuration
-        PAYPAL_ENVIRONMENT: Joi.string()
-            .valid('sandbox', 'live')
-            .default('sandbox')
-            .required()
-            .description('Paypal environment'),
-        PAYPAL_SANDBOX_CLIENT_ID: Joi.string()
-            .when('PAYPAL_ENVIRONMENT', {
-                switch: [
-                    {
-                        is: 'sandbox',
-                        then: Joi.required(),
-                        otherwise: Joi.optional(),
-                    },
-                ],
-            })
-            .description('Paypal sandbox client id'),
-        PAYPAL_SANDBOX_CLIENT_SECRET: Joi.string()
-            .when('PAYPAL_ENVIRONMENT', {
-                switch: [
-                    {
-                        is: 'sandbox',
-                        then: Joi.required(),
-                        otherwise: Joi.optional(),
-                    },
-                ],
-            })
-            .description('Paypal sandbox client secret'),
-        PAYPAL_LIVE_CLIENT_ID: Joi.string()
-            .when('PAYPAL_ENVIRONMENT', {
-                switch: [
-                    {
-                        is: 'live',
-                        then: Joi.required(),
-                        otherwise: Joi.optional(),
-                    },
-                ],
-            })
-            .description('Paypal live client id'),
-        PAYPAL_LIVE_CLIENT_SECRET: Joi.string()
-            .when('PAYPAL_ENVIRONMENT', {
-                switch: [
-                    {
-                        is: 'live',
-                        then: Joi.required(),
-                        otherwise: Joi.optional(),
-                    },
-                ],
-            })
-            .description('Paypal live client secret'),
+        // Firebase configuration
+        FB_TYPE: Joi.string().required().description('Firebase type'),
+        FB_PROJECT_ID: Joi.string().required().description('Firebase project id'),
+        FB_PRIVATE_KEY_ID: Joi.string().required().description('Firebase private key id'),
+        FB_PRIVATE_KEY: Joi.string().required().description('Firebase private key').replace(/\\n/g, '\n'),
+        FB_CLIENT_EMAIL: Joi.string().required().description('Firebase client email'),
+        FB_CLIENT_ID: Joi.string().required().description('Firebase client id'),
+        FB_AUTH_URI: Joi.string().required().description('Firebase auth uri'),
+        FB_TOKEN_URI: Joi.string().required().description('Firebase token uri'),
+        FB_AUTH_PROVIDER_X509_CERT_URL: Joi.string().required().description('Firebase auth provider x509 cert url'),
+        FB_CLIENT_X509_CERT_URL: Joi.string().required().description('Firebase client x509 cert url'),
+        FB_UNIVERSE_DOMAIN: Joi.string().required().description('Firebase universe domain'),
     })
     .unknown();
 
@@ -134,6 +102,7 @@ if (error) {
 const env = {
     environment: envVars.ENVIRONMENT,
     port: envVars.PORT,
+    corsOrigins: envVars.CORS_ORIGINS,
     mongo: {
         url: envVars.MONGO_URI + `-${envVars.ENVIRONMENT}`,
         options: {
@@ -175,6 +144,7 @@ const env = {
             },
         },
         from: envVars.EMAIL_FROM,
+        to: envVars.EMAIL_TO,
     },
     aws: {
         accessKeyId: envVars.AWS_ACCESS_KEY_ID,
@@ -187,16 +157,18 @@ const env = {
         clientId: envVars.GOOGLE_CLIENT_ID,
         clientSecret: envVars.GOOGLE_CLIENT_SECRET,
     },
-    paypal: {
-        environment: envVars.PAYPAL_ENVIRONMENT,
-        sandbox: {
-            clientId: envVars.PAYPAL_SANDBOX_CLIENT_ID,
-            clientSecret: envVars.PAYPAL_SANDBOX_CLIENT_SECRET,
-        },
-        live: {
-            clientId: envVars.PAYPAL_LIVE_CLIENT_ID,
-            clientSecret: envVars.PAYPAL_LIVE_CLIENT_SECRET,
-        },
+    firebase: {
+        type: envVars.FB_TYPE,
+        projectId: envVars.FB_PROJECT_ID,
+        privateKeyId: envVars.FB_PRIVATE_KEY_ID,
+        privateKey: envVars.FB_PRIVATE_KEY,
+        clientEmail: envVars.FB_CLIENT_EMAIL,
+        clientId: envVars.FB_CLIENT_ID,
+        authUri: envVars.FB_AUTH_URI,
+        tokenUri: envVars.FB_TOKEN_URI,
+        authProviderX509CertUrl: envVars.FB_AUTH_PROVIDER_X509_CERT_URL,
+        clientX509CertUrl: envVars.FB_CLIENT_X509_CERT_URL,
+        universeDomain: envVars.FB_UNIVERSE_DOMAIN,
     },
 };
 

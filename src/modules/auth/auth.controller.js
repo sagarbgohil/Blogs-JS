@@ -1,23 +1,19 @@
 import moment from 'moment';
-import {
-    createUser,
-    pullAllRefreshTokens,
-    pullRefreshToken,
-    readUserByEmail,
-    readUserById,
-    updateUserById,
-    upsertUser,
-} from '../users/user.service.js';
+import httpStatus from 'http-status';
+
+import { createUser, readUserByEmail, readUserById, updateUserById, upsertUser } from '../users/user.service.js';
 import { generateAuthTokens, generateToken, verifyToken } from './auth.service.js';
 import env from '../../config/environment.js';
 import { tokenTypes } from '../../config/constants.js';
+import { ApiError } from '../../utils/apiError.js';
 import { sendResetPasswordEmail, sendVerificationEmail } from '../../utils/email.js';
+import { findSessionByRefreshToken, removeAllSessions, removeSession } from '../sessions/sessions.service.js';
 
 export const logout = async (req, res) => {
     const user = req.user;
     const { refreshToken } = req.body;
 
-    await pullRefreshToken(user.id, refreshToken);
+    await removeSession(user.id, refreshToken);
 
     res.success({
         message: 'User logged out successfully',
@@ -27,7 +23,7 @@ export const logout = async (req, res) => {
 export const logoutAll = async (req, res) => {
     const user = req.user;
 
-    await pullAllRefreshTokens(user.id);
+    await removeAllSessions(user.id);
 
     res.success({
         message: 'User logged out from all sessions successfully',
@@ -53,7 +49,7 @@ export const refreshTokens = async (req, res) => {
         throw new ApiError(httpStatus.UNAUTHORIZED, 'User not found');
     }
 
-    const session = user.sessions.find((session) => session.refreshToken === refreshToken);
+    const session = await findSessionByRefreshToken(refreshToken);
     if (!session) {
         throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid refresh token');
     }
@@ -208,7 +204,7 @@ export const signUp = async (req, res) => {
     ]);
 
     res.success({
-        status: httpStatus.CREATED,
+        code: httpStatus.CREATED,
         data: {
             user,
             tokens,
@@ -218,21 +214,21 @@ export const signUp = async (req, res) => {
 };
 
 export const socialSignIn = async (req, res) => {
-    const { email, name, provider = 'google', providerUserId, image } = req.body;
+    const { email, name, provider = 'google', providerUserId, profile } = req.body;
 
     const user = await upsertUser({
         email,
         name,
         provider,
         providerId: providerUserId,
-        profile: image,
+        profile,
         isEmailVerified: true,
     });
 
     const tokens = await generateAuthTokens(user);
 
     res.success({
-        status: httpStatus.CREATED,
+        code: httpStatus.CREATED,
         data: {
             user,
             tokens,

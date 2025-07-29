@@ -44,7 +44,7 @@ export const signInValidation = {
 
 export const signUpValidation = {
     body: Joi.object().keys({
-        name: Joi.string().required().trim(),
+        name: Joi.string().optional().trim(),
         email: Joi.string().email().required().trim(),
         password: Joi.string().custom(passwordValidation).required().trim(),
     }),
@@ -53,9 +53,9 @@ export const signUpValidation = {
 export const socialSignInValidation = {
     body: Joi.object().keys({
         email: Joi.string().email().required().trim(),
-        name: Joi.string().required().trim(),
+        name: Joi.string().optional().trim(),
         provider: Joi.string().valid('google', 'facebook', 'github').default('google').optional().trim(),
         providerUserId: Joi.string().required().trim(),
-        image: Joi.string().uri().optional().trim(),
+        profile: Joi.string().uri().optional().trim(),
     }),
 };

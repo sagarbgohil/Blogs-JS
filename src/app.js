@@ -15,6 +15,7 @@ import { swaggerSpecs } from './config/swagger/swagger.js';
 import { apiRouter } from './routes/api.routes.js';
 import ApiError from './utils/apiError.js';
 import { errorConverter, errorHandler } from './middlewares/error.js';
+import { requestLogger } from './middlewares/reqLogger.js';
 
 export const app = express();
 
@@ -40,15 +41,23 @@ app.use(compression());
 
 app.use(express.static('public'));
 
-app.use(cors());
-app.options('*cors', cors());
+app.use(requestLogger);
+
+const corsOptions = {
+    origin: env.corsOrigins.split(',').map((origin) => origin.trim()),
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    preflightContinue: false,
+};
+
+app.use(cors(corsOptions));
+app.options('*cors', cors(corsOptions));
 
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
 
-if (env.environment === 'prod') {
-    app.use('/api', authLimiter);
-}
+app.use('/api', authLimiter);
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 

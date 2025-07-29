@@ -11,6 +11,7 @@ export const fetchUsersValidation = {
             .valid(...userRoles)
             .optional()
             .trim(),
+        isDeleted: Joi.boolean().optional(),
 
         sortBy: Joi.string().trim().default('createdAt'),
         orderBy: Joi.string().trim().valid('asc', 'desc').default('desc'),
@@ -25,11 +26,25 @@ export const fetchUserByIdValidation = {
     }),
 };
 
+export const removeUserByIdValidation = {
+    params: Joi.object().keys({
+        id: Joi.string().custom(objectId),
+    }),
+};
+
+export const blockUserByIdValidation = {
+    params: Joi.object().keys({
+        id: Joi.string().custom(objectId),
+    }),
+};
+
 export const modifyMeValidation = {
     body: Joi.object().keys({
         name: Joi.string().optional().trim(),
         bio: Joi.string().optional().trim(),
         phone: Joi.string().optional().trim(),
         phoneCountryCode: Joi.string().optional().trim(),
+        profile: Joi.string().optional().trim().allow(''),
+        background: Joi.string().optional().trim().allow(''),
     }),
 };

@@ -33,7 +33,7 @@ export const updateUserById = async (userId, data) => {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Email already exists, Please try logging in');
     }
 
-    const user = await getUserById(userId);
+    const user = await readUserById(userId);
     if (!user) {
         throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
     }
@@ -77,6 +77,30 @@ export const readUserById = async (userId) => {
     return Users.findById(userId);
 };
 
-export const readUserByFilter = async ({ filter, options = {} }) => {
+export const readUserByFilter = async (filter, options = {}) => {
     return Users.paginate(filter, options);
+};
+
+export const deleteUserById = async (userId, deletedBy) => {
+    const user = await readUserById(userId);
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    user.isDeleted = true;
+    user.deletedAt = new Date();
+    user.deletedBy = deletedBy;
+    await user.save();
+    return user;
+};
+
+export const blockUserByIdService = async (userId, blockedBy) => {
+    const user = await readUserById(userId);
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    user.isBlocked = true;
+    user.blockedAt = new Date();
+    user.blockedBy = blockedBy;
+    await user.save();
+    return user;
 };
