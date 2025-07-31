@@ -1,15 +1,15 @@
 import Joi from 'joi';
-import { passwordValidation } from '../../utils/custom.validation.js';
+import { decryptData, passwordValidation } from '../../utils/custom.validation.js';
 
 export const logoutValidation = {
     body: Joi.object().keys({
-        refreshToken: Joi.string().required().trim(),
+        refreshToken: Joi.string().custom(decryptData).required().trim(),
     }),
 };
 
 export const refreshTokensValidation = {
     body: Joi.object().keys({
-        refreshToken: Joi.string().required().trim(),
+        refreshToken: Joi.string().custom(decryptData).required().trim(),
     }),
 };
 

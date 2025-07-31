@@ -1,0 +1,59 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Thank You - Sagar Gohil</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            :root { --color-bg: #ffffff; --color-text: #1c1c22; --color-muted: #555; --color-card: #f6f9f8; --color-border:
+            #ddd; --color-accent: #66fef1; --color-accent-hover: #00e187; } @media (prefers-color-scheme: dark) { :root {
+            --color-bg: #1c1c22; --color-text: #ffffff; --color-muted: #999; --color-card: #2a2a35; --color-border: #3e3e4a;
+            --color-accent: #66fef1; --color-accent-hover: #00e187; } } body { background-color: var(--color-bg); color:
+            var(--color-text); font-family: 'Segoe UI', 'JetBrains Mono', sans-serif; margin: 0; padding: 20px; } .container
+            { max-width: 600px; margin: auto; background-color: var(--color-card); padding: 32px; border-radius: 12px;
+            border: 1px solid var(--color-border); } h2 { color: var(--color-accent); font-size: 24px; margin-bottom: 16px; }
+            p { line-height: 1.6; } .section-title { color: var(--color-accent-hover); margin-top: 24px; margin-bottom: 4px;
+            font-weight: bold; } .field { margin-bottom: 8px; } .footer { margin-top: 32px; font-size: 14px; color:
+            var(--color-muted); } a { color: var(--color-accent); text-decoration: none; } a:hover { color:
+            var(--color-accent-hover); }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Thanks for reaching out{{#if name}}, {{name}}{{/if}}!</h2>
+            <p>
+                I'm grateful for your message and excited about the opportunity to connect with you. I’ll review your
+                submission and respond as soon as possible.
+            </p>
+
+            {{#if service}}
+                <p class="section-title">Service Interested:</p>
+                <p class="field">{{service}}</p>
+            {{/if}}
+
+            {{#if message}}
+                <p class="section-title">Your Message:</p>
+                <p class="field">{{message}}</p>
+            {{/if}}
+
+            {{#if phone}}
+                <p class="section-title">Phone:</p>
+                <p class="field">{{phone}}</p>
+            {{/if}}
+
+            {{#if email}}
+                <p class="section-title">Email:</p>
+                <p class="field">{{email}}</p>
+            {{/if}}
+
+            <div class="footer">
+                <p>Best regards,</p>
+                <p><strong>Sagar Gohil</strong></p>
+                <p>
+                    <a href="https://sagargohil.dev">sagargohil.dev</a>
+                    |
+                    <a href="mailto:connect@sagargohil.dev">connect@sagargohil.dev</a>
+                </p>
+            </div>
+        </div>
+    </body>
+</html>
