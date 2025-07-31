@@ -82,6 +82,23 @@ export const sendContactUsEmail = async (to, data) => {
     });
 };
 
+export const sendThankYouEmail = async (to, data) => {
+    const { name, email, phone, service, message } = data;
+    const subject = 'Thank You for Contacting Us';
+    await sendEmailByTemplate({
+        to,
+        subject,
+        templateName: 'thankYou',
+        contextData: {
+            name,
+            email,
+            phone,
+            service,
+            message,
+        },
+    });
+};
+
 export const sendVerificationEmail = async (to, data) => {
     const { token, name } = data;
     const subject = 'Email Verification OTP';
